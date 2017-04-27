@@ -53,8 +53,6 @@
                     $str = str_replace("oldtablename", $tablename, $str);
                     $str = str_replace("oldredshiftconnectionstring", _REDSHIFT_ENDPOINT, $str);
                     $str = str_replace("oldredshiftdbname", _REDSHIFT_DATABASE, $str);
-                    $str = str_replace("oldDataPipelineDefaultResourceRole", _DATAPIPELINE_RESOURCE_ROLE, $str);
-                    $str = str_replace("oldDataPipelineDefaultRole", _DATAPIPELINE_ROLE, $str);
 
                     $filePointer = fopen("../configurations/datapipeline/".$pipelineid.".json", 'w');
                     fwrite($filePointer, $str);
@@ -93,26 +91,6 @@
                     Put pipeline definition failed, ERROR: '.$ex->getMessage().'
                 </p>';
             }
-        }  else if($action == "deletePipeline" && !is_null($pipelineid)){
-            try {
-                $result = $client->deletePipeline([
-                    'pipelineId' => $pipelineid
-                ]);
-                print '<p class="text-success">
-                    <i class="fa fa-check-square-o"></i> 
-                    Pipeline deleted
-                </p>';
-            } catch (\Aws\DataPipeline\Exception\DataPipelineException $ex){
-                print '<p class="text-danger">
-                    <i class="fa fa-check-times"></i> 
-                    Failed to delete pipeline, ERROR: '.$ex->getAwsErrorCode().'
-                </p>';
-            } catch (Exception $ex){
-                print '<p class="text-danger">
-                    <i class="fa fa-check-times"></i> 
-                    Failed to delete pipeline, ERROR: '.$ex->getMessage().'
-                </p>';
-            }
         } else if($action == "activatePipeline" && !is_null($pipelineid)){
             try {
                 $result = $client->activatePipeline([
@@ -130,6 +108,26 @@
                 print '<p class="text-danger">
                     <i class="fa fa-check-times"></i> 
                     Data Pipeline activation failed, ERROR: '.$ex->getMessage().'
+                </p>';
+            }
+        } else if($action == "deletePipeline" && !is_null($pipelineid)){
+            try {
+                $result = $client->deletePipeline([
+                    'pipelineId' => $pipelineid
+                ]);
+                print '<p class="text-success">
+                    <i class="fa fa-check-square-o"></i> 
+                    Pipeline Deleted
+                </p>';
+            } catch (\Aws\DataPipeline\Exception\DataPipelineException $ex){
+                print '<p class="text-danger">
+                    <i class="fa fa-check-times"></i> 
+                    Data Pipeline deletion failed, ERROR: '.$ex->getAwsErrorCode().'
+                </p>';
+            } catch (Exception $ex){
+                print '<p class="text-danger">
+                    <i class="fa fa-check-times"></i> 
+                    Data Pipeline deletion failed, ERROR: '.$ex->getMessage().'
                 </p>';
             }
         } else if($action == "TaskrunnerHeartbeat"){

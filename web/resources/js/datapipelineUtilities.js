@@ -2,7 +2,7 @@ $(function(){
     tablename = "";
     pipelineid = "";
     url = "../aws-resources/datapipeline.php";
-    region = "us-west-2";
+    var region = "";
     output = $("#datapipelineresult");
     spinner = $("#datapipelinespinner");
     spinner.toggle();
@@ -101,10 +101,10 @@ $(function(){
                 pipelineStatus = pipelineStatus.replace(new RegExp('WAITING_FOR_RUNNER','g'),"<em class='text-warning'>WAITING_FOR_RUNNER</em>");
                 pipelineStatus = pipelineStatus.replace(new RegExp('RUNNING','g'),"<em class='text-info'>RUNNING</em>");
                 $("#datapipelinestatus").html(pipelineStatus);
-                if(pipelineStatus.indexOf("WAIT")!==-1 || pipelineStatus.indexOf("PENDING")!==-1 || pipelineStatus.indexOf("RUNNING")!==-1){
+                finish_count = pipelineStatus.match(new RegExp('FINISH','g') || []).length;
+                if(pipelineStatus.indexOf("WAIT")!==-1 || pipelineStatus.indexOf("PENDING")!==-1 || pipelineStatus.indexOf("RUNNING")!==-1 || finish_count < 3){
                     startStatusCheck();
-                } else {
-                    stopStatusCheck();
+                } else if( finish_count > 3) {
                     $.ajax({
                         url: url,
                         data: { action: "deletePipeline", pipelineid:pipelineid}
@@ -112,8 +112,9 @@ $(function(){
                         $("#datapipelinespinner").hide();
                         $("#datapipelinelivestatus").hide();
                         $("#datapipelinestatus").html("<br><div class='alert alert-success'>Datapipeline Status : <i class='fa fa-circle fa-blink'></i> FINISHED<br>" +
-                            "<a class='btn btn-warning btn-sm' href='../aws-resources/redshift.php?explore=table&table="+tablename+"'>click here</a> " +
-                            "to see '"+tablename+"' table in redshift</div><br/>").append(pipelineStatus);
+                            "<a class='btn btn-warning btn-sm' href='../aws-resources/redshift.php?explore=table&table=" + tablename + "'>click here</a> " +
+                            "to see '" + tablename + "' table in redshift</div><br/>" + pipelineDeleteStatus);
+                        stopStatusCheck();
                     });
                 }
             });
